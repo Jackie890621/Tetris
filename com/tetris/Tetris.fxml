@@ -27,13 +27,13 @@
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <BorderPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -44,12 +44,12 @@
             <Pane fx:id="next3" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2" />
             <Pane fx:id="next4" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3" />
             <Pane fx:id="next5" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4" />
-            <Button fx:id="start" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#startclicked" text="start" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+            <Button fx:id="start" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#startclicked" prefHeight="30.0" prefWidth="100.0" text="start" GridPane.halignment="CENTER" GridPane.rowIndex="5">
                <font>
                   <Font name="System Bold" size="25.0" />
                </font>
             </Button>
-            <Button fx:id="back" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#backclicked" text="back" GridPane.halignment="CENTER" GridPane.rowIndex="6">
+            <Button fx:id="back" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#backclicked" text="back" GridPane.halignment="CENTER" GridPane.rowIndex="6">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
@@ -83,12 +83,12 @@
    <center>
       <Pane fx:id="main" maxHeight="600.0" maxWidth="300.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="single" layoutX="97.0" layoutY="218.0" mnemonicParsing="false" onAction="#singleclicked" prefHeight="50.0" prefWidth="100.0" text="single">
+            <Button fx:id="single" focusTraversable="false" layoutX="97.0" layoutY="218.0" mnemonicParsing="false" onAction="#singleclicked" prefHeight="50.0" prefWidth="100.0" text="single">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>
             </Button>
-            <Button fx:id="multi" layoutX="97.0" layoutY="300.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="multi">
+            <Button fx:id="multi" focusTraversable="false" layoutX="97.0" layoutY="300.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="multi">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>

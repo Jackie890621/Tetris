@@ -2,11 +2,12 @@ package com.tetris;
 
 import com.tetris.Shape.Tetrominoe;
 import javafx.fxml.FXML;
-import javafx.event.ActionEvent;
+import javafx.event.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
+import javafx.scene.input.*;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
@@ -30,12 +31,15 @@ public class TetrisController {
 	
 	private final int BOARD_WIDTH = 10;
     private final int BOARD_HEIGHT = 20;
-	private final int PERIOD_INTERVAL = 200;
-	private Shape curPiece;
+	private final int PERIOD_INTERVAL = 500;
+	private int numLinesRemoved = 0;
+	public Shape curPiece;
+	private Shape lock = new Shape();
     private Tetrominoe[] board;
 	private boolean isFallingFinished = false;
-	private int curX = 0;
-    private int curY = 0;
+	private boolean isPaused = false;
+	public int curX = 0;
+    public int curY = 0;
 	
 	public void initialize() {
 		single.setVisible(true);
@@ -55,6 +59,8 @@ public class TetrisController {
 		next4.setStyle("");
 		next5.setStyle("");
 		hold.setStyle("");
+		//addKeyListener(new TAdapter
+		lock.setShape(Tetrominoe.NoShape);		
 	}
 	
 	@FXML
@@ -78,25 +84,53 @@ public class TetrisController {
 	
 	@FXML
 	private void backclicked(ActionEvent e) {
-		timer.cancel();
-		timer.purge();
+		this.timer.cancel();
+		this.timer.purge();
 		gamecycle.cancel();
 		gamecycle.purge();
 		clearBoard();
 		main.getChildren().clear();
+		main.getChildren().addAll(single, multi);
 		initialize();
 	}
 	
 	@FXML
-	private void startclicked(ActionEvent e) {
+	private void startclicked(ActionEvent ev) {
 		start.setDisable(true);
 		countdown();
 		start();
+		Tetris.scene.setOnKeyPressed(new EventHandler<KeyEvent>() {			
+			
+			@Override
+			public void handle(KeyEvent e) {
+				
+				if (curPiece.getShape() == Tetrominoe.NoShape) {
+					return;
+				}
+				if (e.getCode() == KeyCode.UP) {
+					tryMove(curPiece.rotateRight(), curX, curY);
+				} else if (e.getCode() == KeyCode.DOWN) {
+					oneLineDown();
+				} else if (e.getCode() == KeyCode.LEFT) {
+					tryMove(curPiece, curX - 1, curY);
+				} else if (e.getCode() == KeyCode.RIGHT) {
+					tryMove(curPiece, curX + 1, curY);
+				} else if (e.getCode() == KeyCode.CONTROL) {
+					tryMove(curPiece.rotateLeft(), curX, curY);
+				} else if (e.getCode() == KeyCode.SPACE) {
+					dropDown();
+				} else if (e.getCode() == KeyCode.P) {
+					pause();
+				} else if (e.getCode() == KeyCode.SHIFT) {
+					store(curPiece);
+				}
+			}
+		});
 	}
 	
 	private void countdown() {
-		timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask() {
+		this.timer = new Timer();
+		this.timer.scheduleAtFixedRate(new TimerTask() {
             int i = 120;
 			String time;
 			
@@ -107,9 +141,13 @@ public class TetrisController {
 					time = String.valueOf(i / 60) + ":" + String.valueOf(i % 60);
 				}
 				Platform.runLater(() -> top.setText(time));
-                i--;
+                if (!isPaused) {
+					i--;
+				}
                 if (i < 0) {
                     timer.cancel();
+					curPiece.setShape(Tetrominoe.NoShape);
+					gamecycle.cancel();
                     Platform.runLater(() -> top.setText("Times Up!"));
                 }
             }
@@ -136,6 +174,13 @@ public class TetrisController {
         curPiece.setRandomShape();
         curX = BOARD_WIDTH / 2 + 1;
         curY = BOARD_HEIGHT - 1 + curPiece.minY();
+		
+		if (!tryMove(curPiece, curX, curY)) {
+            curPiece.setShape(Tetrominoe.NoShape);
+            gamecycle.cancel();
+			this.timer.cancel();
+			Platform.runLater(() -> top.setText("You Lose!"));
+        }
 	}
 	
 	private class Gamecycle extends TimerTask {   
@@ -151,6 +196,9 @@ public class TetrisController {
     }
 	
 	private void update() {
+		if (isPaused) {
+            return;
+        }
 		if (isFallingFinished) {
             isFallingFinished = false;
             newPiece();
@@ -159,13 +207,13 @@ public class TetrisController {
         }
     }
 	
-	private void oneLineDown() {
+	public void oneLineDown() {
         if (!tryMove(curPiece, curX, curY - 1)) {
             pieceDropped();
         }
     }
 	
-	private boolean tryMove(Shape newPiece, int newX, int newY) {
+	public boolean tryMove(Shape newPiece, int newX, int newY) {
         for (int i = 0; i < 4; i++) {
             int x = newX + newPiece.x(i);
             int y = newY - newPiece.y(i);
@@ -199,10 +247,41 @@ public class TetrisController {
             board[(y * BOARD_WIDTH) + x] = curPiece.getShape();
         }
 
-        //removeFullLines();
+        removeFullLines();
 
         if (!isFallingFinished) {
             newPiece();
+        }
+    }
+	
+	private void removeFullLines() {
+        int numFullLines = 0;
+
+        for (int i = BOARD_HEIGHT - 1; i >= 0; i--) {
+            boolean lineIsFull = true;
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                if (shapeAt(j, i) == Tetrominoe.NoShape) {
+					lineIsFull = false;
+                    break;
+                }
+            }
+
+            if (lineIsFull) {
+                numFullLines++;
+                for (int k = i; k < BOARD_HEIGHT - 1; k++) {
+                    for (int j = 0; j < BOARD_WIDTH; j++) {
+                        board[(k * BOARD_WIDTH) + j] = shapeAt(j, k + 1);
+                    }
+                }
+            }
+        }
+
+        if (numFullLines > 0) {
+            numLinesRemoved += numFullLines;
+
+            Platform.runLater(() -> score.setText(String.valueOf(numLinesRemoved)));
+            isFallingFinished = true;
+            curPiece.setShape(Tetrominoe.NoShape);
         }
     }
 	
@@ -246,12 +325,6 @@ public class TetrisController {
 						  Color.rgb(255, 0, 255), Color.rgb(255, 255, 0),
 						  Color.rgb(255, 128, 0), Color.rgb(0, 0, 255)
         };
-		//for (int i = 0; i < 8; i++) {
-			//System.out.println(colors[i].getRed() + " " + colors[i].getGreen() + " " + colors[i].getBlue());
-		//}
-		
-        //var color = colors[shape.ordinal()];
-		//System.out.println();
 		
 		Rectangle in = new Rectangle();
 		in.setX(x + 1);
@@ -262,6 +335,40 @@ public class TetrisController {
 		
 		Platform.runLater(() -> main.getChildren().addAll(in));
     }
-}
+	
+	public void dropDown() {
+        int newY = curY;
 
-  
+        while (newY > 0) {
+            if (!tryMove(curPiece, curX, newY - 1)) {
+				break;
+            }
+            newY--;
+        }
+        pieceDropped();
+    }
+	
+	private void pause() {
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            score.setText("paused");
+        } else {
+            score.setText(String.valueOf(numLinesRemoved));
+        }
+        drawing();
+    }
+	
+	private void store(Shape curPiece) {
+		Shape temp = new Shape();
+		if (lock.getShape() == Tetrominoe.NoShape) {
+			lock = curPiece;
+			newPiece();
+		} else {
+			temp = curPiece;
+			curPiece = lock;
+			lock = temp;
+			curY = BOARD_HEIGHT - 1 + curPiece.minY();
+		}
+	}
+}
