@@ -31,13 +31,19 @@ public class TetrisController {
 	
 	private final int BOARD_WIDTH = 10;
     private final int BOARD_HEIGHT = 20;
-	private final int PERIOD_INTERVAL = 500;
+	private final int PERIOD_INTERVAL = 800;
 	private int numLinesRemoved = 0;
 	public Shape curPiece;
+	public Shape next1shape = new Shape();
+	public Shape next2shape = new Shape();
+	public Shape next3shape = new Shape();
+	public Shape next4shape = new Shape();
+	public Shape next5shape = new Shape();
 	private Shape lock = new Shape();
     private Tetrominoe[] board;
 	private boolean isFallingFinished = false;
 	private boolean isPaused = false;
+	private boolean gameStarted = false;
 	public int curX = 0;
     public int curY = 0;
 	
@@ -60,7 +66,12 @@ public class TetrisController {
 		next5.setStyle("");
 		hold.setStyle("");
 		//addKeyListener(new TAdapter
-		lock.setShape(Tetrominoe.NoShape);		
+		lock.setShape(Tetrominoe.NoShape);
+		next1shape.setShape(Tetrominoe.NoShape);
+		next2shape.setShape(Tetrominoe.NoShape);
+		next3shape.setShape(Tetrominoe.NoShape);
+		next4shape.setShape(Tetrominoe.NoShape);
+		next5shape.setShape(Tetrominoe.NoShape);		
 	}
 	
 	@FXML
@@ -69,6 +80,8 @@ public class TetrisController {
 		multi.setVisible(false);
 				
 		top.setVisible(true);
+		numLinesRemoved = 0;
+		score.setText("0");
 		score.setVisible(true);
 		back.setVisible(true);
 		start.setVisible(true);
@@ -84,12 +97,18 @@ public class TetrisController {
 	
 	@FXML
 	private void backclicked(ActionEvent e) {
-		this.timer.cancel();
-		this.timer.purge();
+		timer.cancel();
+		timer.purge();
 		gamecycle.cancel();
 		gamecycle.purge();
 		clearBoard();
 		main.getChildren().clear();
+		next1.getChildren().clear();
+		next2.getChildren().clear();
+		next3.getChildren().clear();
+		next4.getChildren().clear();
+		next5.getChildren().clear();
+		hold.getChildren().clear();
 		main.getChildren().addAll(single, multi);
 		initialize();
 	}
@@ -108,15 +127,15 @@ public class TetrisController {
 					return;
 				}
 				if (e.getCode() == KeyCode.UP) {
-					tryMove(curPiece.rotateRight(), curX, curY);
+					tryMove(curPiece.rotateRight(), curX, curY, true);
 				} else if (e.getCode() == KeyCode.DOWN) {
 					oneLineDown();
 				} else if (e.getCode() == KeyCode.LEFT) {
-					tryMove(curPiece, curX - 1, curY);
+					tryMove(curPiece, curX - 1, curY, true);
 				} else if (e.getCode() == KeyCode.RIGHT) {
-					tryMove(curPiece, curX + 1, curY);
+					tryMove(curPiece, curX + 1, curY, true);
 				} else if (e.getCode() == KeyCode.CONTROL) {
-					tryMove(curPiece.rotateLeft(), curX, curY);
+					tryMove(curPiece.rotateLeft(), curX, curY, true);
 				} else if (e.getCode() == KeyCode.SPACE) {
 					dropDown();
 				} else if (e.getCode() == KeyCode.P) {
@@ -129,8 +148,8 @@ public class TetrisController {
 	}
 	
 	private void countdown() {
-		this.timer = new Timer();
-		this.timer.scheduleAtFixedRate(new TimerTask() {
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
             int i = 120;
 			String time;
 			
@@ -155,6 +174,13 @@ public class TetrisController {
 	}
 	
 	private void start() {
+		next1shape.setRandomShape();
+		next2shape.setRandomShape();
+		next3shape.setRandomShape();
+		next4shape.setRandomShape();
+		next5shape.setRandomShape();
+		gameStarted = true;
+		
         curPiece = new Shape();
         board = new Tetrominoe[BOARD_WIDTH * BOARD_HEIGHT];
 
@@ -171,16 +197,37 @@ public class TetrisController {
     }
 	
 	private void newPiece() {
-        curPiece.setRandomShape();
+        curPiece.setShape(next1shape.getShape());
+		nextshapes();
         curX = BOARD_WIDTH / 2 + 1;
         curY = BOARD_HEIGHT - 1 + curPiece.minY();
 		
-		if (!tryMove(curPiece, curX, curY)) {
+		if (!tryMove(curPiece, curX, curY, true)) {
             curPiece.setShape(Tetrominoe.NoShape);
             gamecycle.cancel();
 			this.timer.cancel();
 			Platform.runLater(() -> top.setText("You Lose!"));
         }
+	}
+	
+	private void nextshapes() {
+		Platform.runLater(() -> next1.getChildren().clear());
+		Platform.runLater(() -> next2.getChildren().clear());
+		Platform.runLater(() -> next3.getChildren().clear());
+		Platform.runLater(() -> next4.getChildren().clear());
+		Platform.runLater(() -> next5.getChildren().clear());
+		if(gameStarted){
+			next1shape.setShape(next2shape.getShape());
+			next2shape.setShape(next3shape.getShape());
+			next3shape.setShape(next4shape.getShape());
+			next4shape.setShape(next5shape.getShape());
+			next5shape.setRandomShape();
+		}
+		drawSmallSquares(next1, next1shape);
+		drawSmallSquares(next2, next2shape);
+		drawSmallSquares(next3, next3shape);
+		drawSmallSquares(next4, next4shape);
+		drawSmallSquares(next5, next5shape);
 	}
 	
 	private class Gamecycle extends TimerTask {   
@@ -208,12 +255,12 @@ public class TetrisController {
     }
 	
 	public void oneLineDown() {
-        if (!tryMove(curPiece, curX, curY - 1)) {
+        if (!tryMove(curPiece, curX, curY - 1, true)) {
             pieceDropped();
         }
     }
 	
-	public boolean tryMove(Shape newPiece, int newX, int newY) {
+	public boolean tryMove(Shape newPiece, int newX, int newY, boolean draw) {
         for (int i = 0; i < 4; i++) {
             int x = newX + newPiece.x(i);
             int y = newY - newPiece.y(i);
@@ -229,10 +276,12 @@ public class TetrisController {
 
         curPiece = newPiece;
         curX = newX;
-        curY = newY;
-
-        drawing();
-
+		
+		if (draw) {
+			curY = newY;
+			drawing();
+		}
+		
         return true;
     }
 	
@@ -248,7 +297,7 @@ public class TetrisController {
         }
 
         removeFullLines();
-
+		//System.out.println(1);
         if (!isFallingFinished) {
             newPiece();
         }
@@ -287,6 +336,9 @@ public class TetrisController {
 	
 	private void drawing() {
 		Platform.runLater(() -> main.getChildren().clear());
+		
+		drawline();
+		
         int boardTop = 600 - BOARD_HEIGHT * squareHeight();
 
         for (int i = 0; i < BOARD_HEIGHT; i++) {
@@ -294,7 +346,7 @@ public class TetrisController {
                 Tetrominoe shape = shapeAt(j, BOARD_HEIGHT - i - 1);
 
                 if (shape != Tetrominoe.NoShape) {
-                    drawSquare(j * squareWidth(), boardTop + i * squareHeight(), shape);
+                    drawSquare(j * squareWidth(), boardTop + i * squareHeight(), shape, 1.0);
                 }
             }
         }
@@ -304,10 +356,47 @@ public class TetrisController {
             for (int i = 0; i < 4; i++) {
                 int x = curX + curPiece.x(i);
                 int y = curY - curPiece.y(i);
+				
+				//System.out.println("old" + curY);
+                drawSquare(x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), curPiece.getShape(), 1.0);
+				int newY = curY;
 
-                drawSquare(x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), curPiece.getShape());
+				while (newY > 0) {
+					if (!tryMove(curPiece, curX, newY - 1, false)) {
+						break;
+					}
+					newY--;
+				}
+				y = newY - curPiece.y(i);
+				//System.out.println("new" + curY);
+                drawSquare(x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), curPiece.getShape(), 0.2);
             }
         }
+	}
+	
+	private void drawline() {
+		for (int i = 30; i < 300; i += 30) {
+			Line line = new Line();
+			line.setStartX((double)i);
+			line.setStartY(0);
+			line.setEndX((double)i);
+			line.setStartY(600);
+			line.setStroke(Color.rgb(255, 255, 255, 0.5));
+			line.getStrokeDashArray().addAll(5d);
+
+			Platform.runLater(() -> main.getChildren().addAll(line));
+		}
+		for (int i = 30; i < 600; i += 30) {
+			Line line = new Line();
+			line.setStartY((double)i);
+			line.setStartX(0);
+			line.setEndY((double)i);
+			line.setStartX(300);
+			line.setStroke(Color.rgb(255, 255, 255, 0.5));
+			line.getStrokeDashArray().addAll(5d);
+
+			Platform.runLater(() -> main.getChildren().addAll(line));
+		}
 	}
 	
 	private int squareWidth() {
@@ -318,7 +407,7 @@ public class TetrisController {
         return 600 / BOARD_HEIGHT;
     }
 	
-	private void drawSquare(int x, int y, Tetrominoe shape) {
+	private void drawSquare(int x, int y, Tetrominoe shape, double alpha) {
 
         Color colors[] = {Color.rgb(0, 0, 0), Color.rgb(255, 0, 0),
 						  Color.rgb(0, 255, 0), Color.rgb(0, 255, 255),
@@ -331,16 +420,46 @@ public class TetrisController {
 		in.setY(y + 1);
 		in.setWidth(squareWidth() - 2);
 		in.setHeight(squareHeight() - 2);
-		in.setFill(colors[shape.ordinal()]);
-		
+		if (alpha > 0.5) {
+			in.setFill(colors[shape.ordinal()]);
+		} else {
+			Color temp = colors[shape.ordinal()];
+			in.setFill(Color.color(temp.getRed(), temp.getGreen(), temp.getBlue(), alpha));
+		}
 		Platform.runLater(() -> main.getChildren().addAll(in));
     }
+	
+	private void drawSmallSquares(Pane p, Shape s){
+		
+		Tetrominoe shape = s.getShape();
+		Color colors[] = {Color.rgb(0, 0, 0), Color.rgb(255, 0, 0),
+						  Color.rgb(0, 255, 0), Color.rgb(0, 255, 255),
+						  Color.rgb(255, 0, 255), Color.rgb(255, 255, 0),
+						  Color.rgb(255, 128, 0), Color.rgb(0, 0, 255)
+        };
+		if (shape != Tetrominoe.NoShape) {
+
+            for (int i = 0; i < 4; i++) {
+				int x = 40 + s.x(i) * 18;
+                int y = 33 + s.y(i) * 18;
+				Rectangle in = new Rectangle();
+				in.setX(x + 1);
+				in.setY(y + 1);
+				in.setWidth(16);
+				in.setHeight(16);
+				in.setFill(colors[shape.ordinal()]);
+				
+				Platform.runLater(() -> p.getChildren().addAll(in));
+                
+            }
+        }
+	}
 	
 	public void dropDown() {
         int newY = curY;
 
         while (newY > 0) {
-            if (!tryMove(curPiece, curX, newY - 1)) {
+            if (!tryMove(curPiece, curX, newY - 1, true)) {
 				break;
             }
             newY--;
@@ -362,13 +481,16 @@ public class TetrisController {
 	private void store(Shape curPiece) {
 		Shape temp = new Shape();
 		if (lock.getShape() == Tetrominoe.NoShape) {
-			lock = curPiece;
+			lock.setShape(curPiece.getShape());
 			newPiece();
-		} else {
-			temp = curPiece;
-			curPiece = lock;
-			lock = temp;
+		} 
+		else {
+			temp.setShape(curPiece.getShape());
+			curPiece.setShape(lock.getShape());
+			lock.setShape(temp.getShape());
 			curY = BOARD_HEIGHT - 1 + curPiece.minY();
 		}
+		hold.getChildren().clear();
+		drawSmallSquares(hold, lock);
 	}
 }
