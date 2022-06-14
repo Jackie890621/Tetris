@@ -2,10 +2,7 @@
 Java
 ## Compile
 ```
-javac -d . .\Shape.java
-```
-```
-javac --module-path $env:PATH_TO_FX --add-modules=javafx.controls,javafx.fxml -d . .\TetrisController.java .\Tetris.java
+javac --module-path $env:PATH_TO_FX --add-modules=javafx.controls,javafx.fxml -d . *.java
 ```
 * 這樣東西就都會跑到com/tetris裡面
 
