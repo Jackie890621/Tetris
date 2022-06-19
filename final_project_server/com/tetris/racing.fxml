@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -9,7 +10,17 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="520.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tetris.TetrisController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="520.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tetris.RacingController">
+   <top>
+      <Label fx:id="top" maxHeight="1.7976931348623157E308" text="2:00" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </BorderPane.margin>
+         <font>
+            <Font name="Microsoft JhengHei Bold" size="30.0" />
+         </font>
+      </Label>
+   </top>
    <right>
       <GridPane maxHeight="600.0" maxWidth="100.0" vgap="10.0" BorderPane.alignment="TOP_LEFT">
         <columnConstraints>
@@ -28,6 +39,16 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </BorderPane.margin>
          <children>
+            <Pane fx:id="next1" prefHeight="200.0" prefWidth="200.0" />
+            <Pane fx:id="next2" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+            <Pane fx:id="next3" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2" />
+            <Pane fx:id="next4" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3" />
+            <Pane fx:id="next5" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4" />
+            <Button fx:id="start" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#startclicked" prefHeight="30.0" prefWidth="100.0" text="start" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+               <font>
+                  <Font name="System Bold" size="25.0" />
+               </font>
+            </Button>
             <Button fx:id="back" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#backclicked" text="back" GridPane.halignment="CENTER" GridPane.rowIndex="6">
                <font>
                   <Font name="System Bold" size="24.0" />
@@ -49,47 +70,17 @@
          <BorderPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </BorderPane.margin>
+         <children>
+            <Label fx:id="line" alignment="CENTER_RIGHT" contentDisplay="RIGHT" text="0" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+               <font>
+                  <Font name="Microsoft JhengHei" size="40.0" />
+               </font>
+            </Label>
+            <Pane fx:id="hold" prefHeight="200.0" prefWidth="200.0" />
+         </children>
       </GridPane>
    </left>
    <center>
-      <Pane fx:id="main" maxHeight="600.0" maxWidth="300.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button fx:id="single" focusTraversable="false" layoutX="100.0" layoutY="218.0" mnemonicParsing="false" onAction="#singleclicked" prefHeight="50.0" prefWidth="100.0" text="single">
-               <font>
-                  <Font name="System Bold" size="22.0" />
-               </font>
-            </Button>
-            <Button fx:id="multi" focusTraversable="false" layoutX="100.0" layoutY="300.0" mnemonicParsing="false" onAction="#multiclicked" prefHeight="50.0" prefWidth="100.0" text="multi">
-               <font>
-                  <Font name="System Bold" size="22.0" />
-               </font>
-            </Button>
-            <Button fx:id="normal" layoutX="100.0" layoutY="60.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#normalclicked" prefHeight="60.0" prefWidth="100.0" text="Normal">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Button>
-            <Button fx:id="racing" layoutX="100.0" layoutY="160.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#racingclicked" prefHeight="60.0" prefWidth="100.0" text="Racing">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Button>
-            <Button fx:id="marathon" layoutX="100.0" layoutY="260.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#marathonclicked" prefHeight="60.0" prefWidth="100.0" text="Marathon">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Button>
-            <Button fx:id="obstacle" layoutX="100.0" layoutY="360.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#obstacleclicked" prefHeight="60.0" prefWidth="100.0" text="Obstacle">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Button>
-            <Button fx:id="challenge" layoutX="100.0" layoutY="460.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#challengeclicked" prefHeight="60.0" prefWidth="100.0" text="Challenge">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Button>
-         </children>
-      </Pane>
+      <Pane fx:id="main" maxHeight="600.0" maxWidth="300.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

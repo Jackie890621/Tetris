@@ -18,7 +18,7 @@ public class MultiController {
 
     @FXML Button back;
     @FXML Pane myhold;
-    @FXML public Pane mymain;
+    @FXML public transient Pane mymain;
     @FXML Pane mynext1;
     @FXML Pane mynext2;
     @FXML Pane mynext3;
@@ -28,7 +28,7 @@ public class MultiController {
     @FXML Button mystart;
 	@FXML Label top;
     @FXML Pane yourhold;
-    @FXML public Pane yourmain;
+    @FXML public transient Pane yourmain;
     @FXML Pane yournext1;
     @FXML Pane yournext2;
     @FXML Pane yournext3;
@@ -45,20 +45,171 @@ public class MultiController {
 	private final int PERIOD_INTERVAL = 800;
 	private int numLinesRemoved = 0;
 	public Shape curPiece;
+	public Shape ycurPiece = new Shape();
 	public Shape next1shape = new Shape();
 	public Shape next2shape = new Shape();
 	public Shape next3shape = new Shape();
 	public Shape next4shape = new Shape();
 	public Shape next5shape = new Shape();
+	public Shape mynext1shape = new Shape();
+	public Shape mynext2shape = new Shape();
+	public Shape mynext3shape = new Shape();
+	public Shape mynext4shape = new Shape();
+	public Shape mynext5shape = new Shape();
+	public Shape yournext1shape = new Shape();
+	public Shape yournext2shape = new Shape();
+	public Shape yournext3shape = new Shape();
+	public Shape yournext4shape = new Shape();
+	public Shape yournext5shape = new Shape();
 	private Shape lock = new Shape();
-    private Tetrominoe[] board;
-	//private Tetrominoe[] yourboard;
+    public Tetrominoe[] board;
+	public int[] boardint = new int[200];
+	public Tetrominoe[] yourboard;
+	public int[] yboardint = new int[200];
 	private boolean isFallingFinished = false;
 	private boolean isPaused = false;
 	private boolean gameStarted = false;
 	public int curX = 0;
     public int curY = 0;
+	public int ycurX = 0;
+    public int ycurY = 0;
 	
+	class Mymainclass{
+		int curPieceINT;
+		int mynext1INT;
+		int mynext2INT;
+		int mynext3INT;
+		int mynext4INT;
+		int mynext5INT;
+		int curXINT;
+		int curYINT;
+	}
+	
+	class Yourmainclass{
+		int ycurPieceINT;
+		int yournext1INT;
+		int yournext2INT;
+		int yournext3INT;
+		int yournext4INT;
+		int yournext5INT;
+		int ycurXINT;
+		int ycurYINT;
+	}
+	
+	private Shape inttoshape(int i){
+		Shape s = new Shape();
+		switch(i){
+			case 0:
+				s.setShape(Tetrominoe.NoShape);
+				break;
+			case 1:
+				s.setShape(Tetrominoe.ZShape);
+				break;
+			case 2:
+				s.setShape(Tetrominoe.SShape);
+				break;
+			case 3:
+				s.setShape(Tetrominoe.LineShape);
+				break;
+			case 4:
+				s.setShape(Tetrominoe.TShape);
+				break;
+			case 5:
+				s.setShape(Tetrominoe.SquareShape);
+				break;
+			case 6:
+				s.setShape(Tetrominoe.LShape);
+				break;
+			case 7:
+				s.setShape(Tetrominoe.MirroredLShape);
+				break;
+		}
+		return s;
+	}
+	
+	private int shapetoint(Shape s){
+		Tetrominoe shape = s.getShape();
+		int shapenum = 0;
+		switch(shape){
+			case NoShape:
+				shapenum =  0;
+				break;
+			case ZShape:
+				shapenum =  1;
+				break;
+			case SShape:
+				shapenum =  2;
+				break;
+			case LineShape:
+				shapenum =  3;
+				break;
+			case TShape:
+				shapenum =  4;
+				break;
+			case SquareShape:
+				shapenum =  5;
+				break;
+			case LShape:
+				shapenum =  6;
+				break;
+			case MirroredLShape:
+				shapenum =  7;
+				break;
+		}
+		return shapenum;
+	}
+	
+	private void converttoint(Mymainclass m){
+		m.curPieceINT = shapetoint(curPiece);
+		mynext1shape.setShape(next1shape.getShape());
+		mynext2shape.setShape(next2shape.getShape());
+		mynext3shape.setShape(next3shape.getShape());
+		mynext4shape.setShape(next4shape.getShape());
+		mynext5shape.setShape(next5shape.getShape());
+		m.mynext1INT = shapetoint(mynext1shape);
+		m.mynext2INT = shapetoint(mynext2shape);
+		m.mynext3INT = shapetoint(mynext3shape);
+		m.mynext4INT = shapetoint(mynext4shape);
+		m.mynext5INT = shapetoint(mynext5shape);
+		m.curXINT = curX;
+		m.curYINT = curY;
+		boardint = boardInt();
+	}
+	
+	private void converttoshape(Yourmainclass y){
+		ycurPiece = inttoshape(y.ycurPieceINT);
+		yournext1shape = inttoshape(y.yournext1INT);
+		yournext2shape = inttoshape(y.yournext2INT);
+		yournext3shape = inttoshape(y.yournext3INT);
+		yournext4shape = inttoshape(y.yournext4INT);
+		yournext5shape = inttoshape(y.yournext5INT);
+		ycurX = y.ycurXINT;
+		ycurY = y.ycurYINT;
+		yourboard = boardTet(yboardint);
+	}
+	
+	private void send(Mymainclass m){
+		server.sendIntToClient(99);
+		server.sendIntToClient(m.curPieceINT);
+		server.sendIntToClient(m.mynext1INT);
+		server.sendIntToClient(m.mynext2INT);
+		server.sendIntToClient(m.mynext3INT);
+		server.sendIntToClient(m.mynext4INT);
+		server.sendIntToClient(m.mynext5INT);
+		server.sendIntToClient(m.curXINT);
+		server.sendIntToClient(m.curYINT);
+	}
+	
+	private void receive(Yourmainclass y){
+		y.ycurPieceINT = server.receiveIntFromClient();
+		y.yournext1INT = server.receiveIntFromClient();
+		y.yournext2INT = server.receiveIntFromClient();
+		y.yournext3INT = server.receiveIntFromClient();
+		y.yournext4INT = server.receiveIntFromClient();
+		y.yournext5INT = server.receiveIntFromClient();
+		y.ycurXINT = server.receiveIntFromClient();
+		y.ycurYINT = server.receiveIntFromClient();
+	}
 
 	public void initialize() {
 		System.out.println(1);
@@ -103,37 +254,39 @@ public class MultiController {
 
     @FXML
     void startclicked(ActionEvent event) {
-		mystart.setDisable(true);
-		countdown();
-		start();
-		Multi.scene.setOnKeyPressed(new EventHandler<KeyEvent>() {			
-			
-			@Override
-			public void handle(KeyEvent e) {
+		if (server.receiveIntFromClient() == 123){
+			mystart.setDisable(true);
+			countdown();
+			start();
+			Multi.scene.setOnKeyPressed(new EventHandler<KeyEvent>() {			
 				
-				if (curPiece.getShape() == Tetrominoe.NoShape) {
-					return;
+				@Override
+				public void handle(KeyEvent e) {
+					if (curPiece.getShape() == Tetrominoe.NoShape) {
+						return;
+					}
+					if (e.getCode() == KeyCode.UP) {
+						tryMove(curPiece.rotateRight(), curX, curY, true);
+					} else if (e.getCode() == KeyCode.DOWN) {
+						oneLineDown();
+					} else if (e.getCode() == KeyCode.LEFT) {
+						tryMove(curPiece, curX - 1, curY, true);
+					} else if (e.getCode() == KeyCode.RIGHT) {
+						tryMove(curPiece, curX + 1, curY, true);
+					} else if (e.getCode() == KeyCode.CONTROL) {
+						tryMove(curPiece.rotateLeft(), curX, curY, true);
+					} else if (e.getCode() == KeyCode.SPACE) {
+						dropDown();
+					} else if (e.getCode() == KeyCode.P) {
+						pause();
+					} else if (e.getCode() == KeyCode.SHIFT) {
+						store(curPiece);
+					}
+					
+					
 				}
-				if (e.getCode() == KeyCode.UP) {
-					tryMove(curPiece.rotateRight(), curX, curY, true);
-				} else if (e.getCode() == KeyCode.DOWN) {
-					oneLineDown();
-				} else if (e.getCode() == KeyCode.LEFT) {
-					tryMove(curPiece, curX - 1, curY, true);
-				} else if (e.getCode() == KeyCode.RIGHT) {
-					tryMove(curPiece, curX + 1, curY, true);
-				} else if (e.getCode() == KeyCode.CONTROL) {
-					tryMove(curPiece.rotateLeft(), curX, curY, true);
-				} else if (e.getCode() == KeyCode.SPACE) {
-					dropDown();
-				} else if (e.getCode() == KeyCode.P) {
-					pause();
-				} else if (e.getCode() == KeyCode.SHIFT) {
-					store(curPiece);
-				}
-			}
-		});
-		server.receiveMessageFromClient(yourmain);
+			});
+		}
     }
 	
 	private void countdown() {
@@ -158,6 +311,20 @@ public class MultiController {
 					curPiece.setShape(Tetrominoe.NoShape);
 					gamecycle.cancel();
                     Platform.runLater(() -> top.setText("Times Up!"));
+					server.sendIntToClient(numLinesRemoved);
+					server.sendIntToClient(numLinesRemoved);
+					server.sendIntToClient(numLinesRemoved);
+					int clientsocre = server.receiveIntFromClient();
+					clientsocre = server.receiveIntFromClient();
+					clientsocre = server.receiveIntFromClient();
+					int x = clientsocre;
+					Platform.runLater(() -> yourscore.setText(String.valueOf(x)));
+					if(clientsocre == numLinesRemoved)
+						Platform.runLater(() -> top.setText("Times Up!"));
+					else if(clientsocre > numLinesRemoved)
+						Platform.runLater(() -> top.setText("You Lose!"));
+					else if(clientsocre < numLinesRemoved)
+						Platform.runLater(() -> top.setText("You Win!"));
                 }
             }
         }, 0, 1000);
@@ -173,7 +340,10 @@ public class MultiController {
 		
         curPiece = new Shape();
         board = new Tetrominoe[BOARD_WIDTH * BOARD_HEIGHT];
-		//yourboard = new Tetrominoe[BOARD_WIDTH * BOARD_HEIGHT];
+		yourboard = new Tetrominoe[BOARD_WIDTH * BOARD_HEIGHT];
+        for (int i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; i++) {
+            yourboard[i] = Tetrominoe.NoShape;
+        }
 
         clearBoard();
         newPiece();
@@ -184,7 +354,6 @@ public class MultiController {
 	private void clearBoard() {
         for (int i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; i++) {
             board[i] = Tetrominoe.NoShape;
-			//yourboard[i] = Tetrominoe.NoShape;
         }
     }
 	
@@ -199,6 +368,8 @@ public class MultiController {
             gamecycle.cancel();
 			timer.cancel();
 			Platform.runLater(() -> top.setText("You Lose!"));
+			for(int i = 0; i < 100; i++)
+				server.sendIntToClient(999);
         }
 	}
 	
@@ -220,6 +391,11 @@ public class MultiController {
 		drawSmallSquares(mynext3, next3shape);
 		drawSmallSquares(mynext4, next4shape);
 		drawSmallSquares(mynext5, next5shape);
+		drawSmallSquares(yournext1, yournext1shape);
+		drawSmallSquares(yournext2, yournext2shape);
+		drawSmallSquares(yournext3, yournext3shape);
+		drawSmallSquares(yournext4, yournext4shape);
+		drawSmallSquares(yournext5, yournext5shape);
 	}
 
 	private class Gamecycle extends TimerTask {   
@@ -230,7 +406,37 @@ public class MultiController {
 	}
 	
 	private void doGameCycle() {
-		server.sendMessageToClient(mymain);
+		boardint = boardInt();
+		server.sendIntToClient(-99);
+		for(int i = 0; i < 200; i++){
+			server.sendIntToClient(boardint[i]);
+		}
+		server.sendIntToClient(numLinesRemoved);
+		if(server.receiveIntFromClient() == -99){
+			for(int i = 0; i < 200; i++){
+				yboardint[i] = server.receiveIntFromClient();
+			}
+			yourboard = boardTet(yboardint);
+			int a = server.receiveIntFromClient();
+			Platform.runLater(() -> yourscore.setText(String.valueOf(a)));
+		}
+		else if(server.receiveIntFromClient() == 999){
+			curPiece.setShape(Tetrominoe.NoShape);
+            gamecycle.cancel();
+			timer.cancel();
+			Platform.runLater(() -> top.setText("You Win!"));
+		}
+		
+		Platform.runLater(() -> yournext1.getChildren().clear());
+		Platform.runLater(() -> yournext2.getChildren().clear());
+		Platform.runLater(() -> yournext3.getChildren().clear());
+		Platform.runLater(() -> yournext4.getChildren().clear());
+		Platform.runLater(() -> yournext5.getChildren().clear());
+		drawSmallSquares(yournext1, yournext1shape);
+		drawSmallSquares(yournext2, yournext2shape);
+		drawSmallSquares(yournext3, yournext3shape);
+		drawSmallSquares(yournext4, yournext4shape);
+		drawSmallSquares(yournext5, yournext5shape);
 		
         update();
         drawing();
@@ -263,7 +469,7 @@ public class MultiController {
                 return false;
             }
 
-            if (shapeAt(x, y) != Tetrominoe.NoShape) {
+            if (shapeAt(x, y, 1) != Tetrominoe.NoShape) {
                 return false;
             }
         }
@@ -275,12 +481,38 @@ public class MultiController {
 			curY = newY;
 			drawing();
 		}
-		
-        return true;
+		return true;
     }
 	
-	private Tetrominoe shapeAt(int x, int y) {
-        return board[(y * BOARD_WIDTH) + x];
+	private int[] boardInt(){
+		int[] intboard = new int[200];
+		for (int i = 0; i < BOARD_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                Tetrominoe shape1 = shapeAt(j, BOARD_HEIGHT - i - 1, 1);
+
+                if (shape1 != Tetrominoe.NoShape) {
+					Shape s = new Shape();
+					s.setShape(shape1);
+                    intboard[((BOARD_HEIGHT - i - 1) * BOARD_WIDTH) + j] = shapetoint(s);
+                }
+            }
+        }
+		return intboard;
+	}
+	
+	private Tetrominoe[] boardTet(int[] t){
+		Tetrominoe[] temp = new Tetrominoe[200];
+		for (int i = 0; i < 200; i++) {
+			temp[i] = inttoshape(t[i]).getShape();
+        }
+		return temp;
+	}
+	
+	private Tetrominoe shapeAt(int x, int y, int i) {
+		if(i == 1)
+			return board[(y * BOARD_WIDTH) + x];
+		else
+			return yourboard[(y * BOARD_WIDTH) + x];
     }
 	
 	private void pieceDropped() {
@@ -288,6 +520,7 @@ public class MultiController {
             int x = curX + curPiece.x(i);
             int y = curY - curPiece.y(i);
             board[(y * BOARD_WIDTH) + x] = curPiece.getShape();
+            //yourboard[(y * BOARD_WIDTH) + x] = ycurPiece.getShape();
         }
 
         removeFullLines();
@@ -295,6 +528,13 @@ public class MultiController {
         if (!isFallingFinished) {
             newPiece();
         }
+		boardint = boardInt();
+		server.sendIntToClient(-99);
+		for(int i = 0; i < 200; i++){
+			server.sendIntToClient(boardint[i]);
+		}
+		server.sendIntToClient(numLinesRemoved);
+		
     }
 	
 	private void removeFullLines() {
@@ -303,7 +543,7 @@ public class MultiController {
         for (int i = BOARD_HEIGHT - 1; i >= 0; i--) {
             boolean lineIsFull = true;
             for (int j = 0; j < BOARD_WIDTH; j++) {
-                if (shapeAt(j, i) == Tetrominoe.NoShape) {
+                if (shapeAt(j, i, 1) == Tetrominoe.NoShape) {
 					lineIsFull = false;
                     break;
                 }
@@ -313,7 +553,8 @@ public class MultiController {
                 numFullLines++;
                 for (int k = i; k < BOARD_HEIGHT - 1; k++) {
                     for (int j = 0; j < BOARD_WIDTH; j++) {
-                        board[(k * BOARD_WIDTH) + j] = shapeAt(j, k + 1);
+                        board[(k * BOARD_WIDTH) + j] = shapeAt(j, k + 1, 1);
+                        //yourboard[(k * BOARD_WIDTH) + j] = shapeAt(j, k + 1, 2);
                     }
                 }
             }
@@ -326,10 +567,12 @@ public class MultiController {
             isFallingFinished = true;
             curPiece.setShape(Tetrominoe.NoShape);
         }
+		
     }
 	
 	private void drawing() {
 		Platform.runLater(() -> mymain.getChildren().clear());
+		Platform.runLater(() -> yourmain.getChildren().clear());
 		
 		drawline();
 		
@@ -337,10 +580,14 @@ public class MultiController {
 
         for (int i = 0; i < BOARD_HEIGHT; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
-                Tetrominoe shape = shapeAt(j, BOARD_HEIGHT - i - 1);
+                Tetrominoe shape1 = shapeAt(j, BOARD_HEIGHT - i - 1, 1);
+                Tetrominoe shape2 = shapeAt(j, BOARD_HEIGHT - i - 1, 2);
 
-                if (shape != Tetrominoe.NoShape) {
-                    drawSquare(j * squareWidth(), boardTop + i * squareHeight(), shape, 1.0);
+                if (shape1 != Tetrominoe.NoShape) {
+                    drawSquare(j * squareWidth(), boardTop + i * squareHeight(), shape1, 1.0, 1);
+                }
+				if (shape2 != Tetrominoe.NoShape) {
+                    drawSquare(j * squareWidth(), boardTop + i * squareHeight(), shape2, 1.0, 2);
                 }
 				
             }
@@ -353,7 +600,7 @@ public class MultiController {
                 int y = curY - curPiece.y(i);
 				
 				//System.out.println("old" + curY);
-                drawSquare(x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), curPiece.getShape(), 1.0);
+                drawSquare(x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), curPiece.getShape(), 1.0, 1);
 				int newY = curY;
 
 				while (newY > 0) {
@@ -364,7 +611,28 @@ public class MultiController {
 				}
 				y = newY - curPiece.y(i);
 				//System.out.println("new" + curY);
-                drawSquare(x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), curPiece.getShape(), 0.2);
+                drawSquare(x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), curPiece.getShape(), 0.2, 1);
+            }
+        }
+		if (ycurPiece.getShape() != Tetrominoe.NoShape) {
+
+            for (int i = 0; i < 4; i++) {
+                int x = ycurX + ycurPiece.x(i);
+                int y = ycurY - ycurPiece.y(i);
+				
+				//System.out.println("old" + curY);
+                drawSquare(x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), ycurPiece.getShape(), 1.0, 2);
+				int newY = ycurY;
+
+				/*while (newY > 0) {
+					if (!tryMove(ycurPiece, ycurX, newY - 1, false)) {
+						break;
+					}
+					newY--;
+				}
+				y = newY - ycurPiece.y(i);
+				//System.out.println("new" + curY);
+                drawSquare(x * squareWidth(), boardTop + (BOARD_HEIGHT - y - 1) * squareHeight(), ycurPiece.getShape(), 0.2, 2);*/
             }
         }
 	}
@@ -404,7 +672,10 @@ public class MultiController {
         return 600 / BOARD_HEIGHT;
     }
 	
-	private void drawSquare(int x, int y, Tetrominoe shape, double alpha) {
+	private void drawSquare(int x, int y, Tetrominoe shape, double alpha, int i) {
+
+		Shape s = new Shape();
+		s.setShape(shape);
 
         Color colors[] = {Color.rgb(0, 0, 0), Color.rgb(255, 0, 0),
 						  Color.rgb(0, 255, 0), Color.rgb(0, 255, 255),
@@ -418,12 +689,15 @@ public class MultiController {
 		in.setWidth(squareWidth() - 2);
 		in.setHeight(squareHeight() - 2);
 		if (alpha > 0.5) {
-			in.setFill(colors[shape.ordinal()]);
+			in.setFill(colors[shapetoint(s)]);
 		} else {
-			Color temp = colors[shape.ordinal()];
+			Color temp = colors[shapetoint(s)];
 			in.setFill(Color.color(temp.getRed(), temp.getGreen(), temp.getBlue(), alpha));
 		}
-		Platform.runLater(() -> mymain.getChildren().addAll(in));
+		if(i == 1)
+			Platform.runLater(() -> mymain.getChildren().addAll(in));
+		else if(i == 2)
+			Platform.runLater(() -> yourmain.getChildren().addAll(in));
     }
 	
 	private void drawSmallSquares(Pane p, Shape s){
@@ -435,7 +709,6 @@ public class MultiController {
 						  Color.rgb(255, 128, 0), Color.rgb(0, 0, 255)
         };
 		if (shape != Tetrominoe.NoShape) {
-
             for (int i = 0; i < 4; i++) {
 				int x = 40 + s.x(i) * 18;
                 int y = 33 + s.y(i) * 18;
@@ -444,7 +717,7 @@ public class MultiController {
 				in.setY(y + 1);
 				in.setWidth(16);
 				in.setHeight(16);
-				in.setFill(colors[shape.ordinal()]);
+				in.setFill(colors[shapetoint(s)]);
 				
 				Platform.runLater(() -> p.getChildren().addAll(in));
                 
@@ -491,9 +764,9 @@ public class MultiController {
 		drawSmallSquares(myhold, lock);
 	}
 	
-	public static void display(Pane temp, Pane yourmain) {
-		for (int i = 0; i < temp.getChildren().size(); i++) {
+	public static void display(Pane temp, Yourmainclass yourmain) {
+		/*for (int i = 0; i < temp.getChildren().size(); i++) {
 			yourmain.getChildren().add(temp.getChildren().get(i));
-		}
+		}*/
 	}
 }

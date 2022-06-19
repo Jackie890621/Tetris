@@ -15,6 +15,8 @@ public class Server{
 	private ObjectInputStream objectInputStream;
 	private OutputStream outputStream;
 	private ObjectOutputStream objectOutputStream;
+	private DataOutputStream output = null;
+	private DataInputStream input = null;
 	
 	public Server(ServerSocket serverSocket){
 		System.out.println(2);
@@ -34,28 +36,43 @@ public class Server{
 		}
 	}
 	
-	public void sendMessageToClient(Pane temp) {
+	public void sendMessageToClient(Tetrominoe[] temp) {
 		try {
 			objectOutputStream = new ObjectOutputStream(outputStream);
 			objectOutputStream.writeObject(temp);
 		} catch (IOException e) {
-			System.out.println("Error creating server");
+			System.out.println("Error sending message");
 			e.printStackTrace();
 			closeEverything(socket, objectInputStream, objectOutputStream);
 		}
 	}
 	
-	public void receiveMessageFromClient(Pane your) {
+	public void sendIntToClient(int temp) {
+		try {
+			output = new DataOutputStream(outputStream);
+			output.writeInt(temp);
+			//output.reset();
+		} catch (IOException e) {
+			System.out.println("Error sending message");
+			e.printStackTrace();
+			CloseEverything(socket, input, output);
+		}
+	}
+	
+	/*public Tetrominoe[] receiveMessageFromClient() {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				while (socket.isConnected()) {
 					try {
+						//objectOutputStream.reset();
 						objectInputStream = new ObjectInputStream(inputStream);
-						Pane temp = (Pane) objectInputStream.readObject();
-						MultiController.display(temp, your);
+						Tetrominoe[] yourboard = objectInputStream.readObject();
+						return yourboard;
+						//Pane temp = (Pane) objectInputStream.readObject();
+						//MultiController.display(temp, your);
 					} catch (Exception e) {
-						System.out.println("Error creating server");
+						System.out.println("Error receiving message");
 						e.printStackTrace();
 						closeEverything(socket, objectInputStream, objectOutputStream);
 						break;
@@ -63,6 +80,19 @@ public class Server{
 				}
 			}
 		}).start();
+	}*/
+	
+	public int receiveIntFromClient() {
+		int a = 0;
+		try {
+			input = new DataInputStream(inputStream);
+			a = input.readInt();
+		} catch (IOException e) {
+			System.out.println("Error receiving message");
+			e.printStackTrace();
+			CloseEverything(socket, input, output);
+		}
+		return a;
 	}
 	
 	public void closeEverything (Socket socket, ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream) {
@@ -75,6 +105,22 @@ public class Server{
 			}
 			if (objectOutputStream != null) {
 				objectOutputStream.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void CloseEverything (Socket socket, DataInputStream objectInputStream, DataOutputStream objectOutputStream) {
+		try {
+			if (socket != null) {
+				socket.close();
+			}
+			if (input != null) {
+				input.close();
+			}
+			if (output != null) {
+				output.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

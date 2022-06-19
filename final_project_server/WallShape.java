@@ -2,19 +2,23 @@ package com.tetris;
 
 import java.util.Random;
 
-public class Shape {
+public class WallShape {
 
-    protected enum Tetrominoe {NoShape, ZShape, SShape, LineShape, 
-							   TShape, SquareShape, LShape, MirroredLShape}
+    protected enum Tetrominoe {NoShape, wallShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape}
 
     private Tetrominoe pieceShape;
     private int coords[][];
     private int[][][] coordsTable;
 
-    public Shape() {
-		coords = new int[4][2];
+    public WallShape() {
+        initShape();
+    }
+
+    private void initShape() {
+        coords = new int[4][2];
         coordsTable = new int[][][] {
                 {{0, 0}, {0, 0}, {0, 0}, {0, 0}},
+				{{0, 0}, {0, 0}, {0, 0}, {0, 0}},
                 {{0, -1}, {0, 0}, {-1, 0}, {-1, 1}},
                 {{0, -1}, {0, 0}, {1, 0}, {1, 1}},
                 {{0, -1}, {0, 0}, {0, 1}, {0, 2}},
@@ -57,7 +61,7 @@ public class Shape {
 
     public void setRandomShape() {
         var r = new Random();
-        int x = Math.abs(r.nextInt()) % 7 + 1;
+        int x = Math.abs(r.nextInt()) % 7 + 2;
 
         Tetrominoe[] values = Tetrominoe.values();
         setShape(values[x]);
@@ -66,7 +70,7 @@ public class Shape {
     public int minX() {
         int m = coords[0][0];
 
-        for (int i=0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             m = Math.min(m, coords[i][0]);
         }
 
@@ -77,19 +81,19 @@ public class Shape {
     public int minY() {
         int m = coords[0][1];
 
-        for (int i=0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             m = Math.min(m, coords[i][1]);
         }
 
         return m;
     }
 
-    public Shape rotateLeft() {
+    public WallShape rotateLeft() {
         if (pieceShape == Tetrominoe.SquareShape) {
 			return this;
         }
 
-        var result = new Shape();
+        var result = new WallShape();
         result.pieceShape = pieceShape;
 
         for (int i = 0; i < 4; ++i) {
@@ -100,12 +104,12 @@ public class Shape {
         return result;
     }
 
-    public Shape rotateRight() {
+    public WallShape rotateRight() {
         if (pieceShape == Tetrominoe.SquareShape) {
             return this;
         }
 
-        var result = new Shape();
+        var result = new WallShape();
         result.pieceShape = pieceShape;
 
         for (int i = 0; i < 4; ++i) {

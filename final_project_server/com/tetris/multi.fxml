@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tetris.MultiController">
    <children>
       <Pane fx:id="mymain" layoutX="110.0" layoutY="50.0" maxHeight="600.0" maxWidth="300.0" prefHeight="600.0" prefWidth="300.0" />
@@ -50,14 +49,9 @@
             <Pane fx:id="mynext3" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2" />
             <Pane fx:id="mynext4" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3" />
             <Pane fx:id="mynext5" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4" />
-            <Button fx:id="mystart" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#startclicked" prefHeight="30.0" prefWidth="100.0" text="start" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+            <Button fx:id="mystart" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#startclicked" prefHeight="30.0" prefWidth="100.0" text="start" GridPane.rowIndex="5">
                <font>
                   <Font name="System Bold" size="25.0" />
-               </font>
-            </Button>
-            <Button fx:id="back" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#backclicked" text="back" GridPane.halignment="CENTER" GridPane.rowIndex="6">
-               <font>
-                  <Font name="System Bold" size="24.0" />
                </font>
             </Button>
          </children>
